@@ -1,19 +1,21 @@
 - name: Создание replication user на мастере
   community.mysql.mysql_user:
+    login_host: "{{ ansible_host }}"
+    login_port: "{{ mysql_port }}"
     login_user: root
     login_password: "{{ db_root_pass }}"
-    name: {{ db_repl_user }}
-    password: {{ db_repl_password }}
+    name: "{{ db_repl_user }}"
+    password: "{{ db_repl_password }}"
     host: "%"
-    priv: "{{ db_name }}.*:REPLICATION SLAVE"
+    priv: "*.*:REPLICATION SLAVE" 
     state: present
 
 - name: Получение master status
   community.mysql.mysql_query:
     login_host: "{{ ansible_host }}"
     login_port: "{{ mysql_port }}"
-    login_user: "{{ root_user_name }}"
-    login_password: "{{ root_user_pass }}"
+    login_user: "root"
+    login_password: "{{ db_root_pass }}"
     query: "SHOW MASTER STATUS"
   register: master_status
   changed_when: false

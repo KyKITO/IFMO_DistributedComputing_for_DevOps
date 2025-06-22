@@ -1,51 +1,43 @@
 ---
-- name: Установка Docker
-  hosts: all
-  become: yes
-  vars:
-    docker_users: [ ubuntu,user ]
+# Этот файл содержит ТОЛЬКО задачи (tasks)
+- name: Добавление GPG ключа Docker
+  ansible.builtin.apt_key:
+    url: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
 
-  tasks:
+- name: Добавление docker-репозитория
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
+    state: present
 
-    - name: Добавление GPG ключа
-      apt_key:
-        url: "https://download.docker.com/linux/ubuntu/gpg"
-        state: present
+- name: Установка требуемых пакетов
+  ansible.builtin.apt:
+    update_cache: yes
+    name:
+      - ca-certificates
+      - curl
+      - python3-pip
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
 
+- name: Обновление всех пакетов
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
 
-    - name: Добавление docker-репозитория
-      apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
-        state: present
+- name: Добавление пользователей в группу Docker
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop: "{{ docker_users }}"
+  when: docker_users | length > 0
 
-    - name: Установка нужных пакетов
-      apt:
-        update_cache: yes
-        name:
-          - ca-certificates
-          - curl
-          - python3-pip
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-compose-plugin
-        state: present
-
-    - name: Обновление всех пакетов
-      ansible.builtin.apt:
-        name: "*"
-        state: latest
-
-    - name: Добавление пользователя в группу Docker
-      user:
-        name: "{{ item }}"
-        groups: docker
-        append: yes
-      loop: "{{ docker_users }}"
-      when: docker_users | length > 0
-
-    - name: Автозапуск сервиса
-      service:
-        name: docker
-        state: started
-        enabled: yes
+- name: Запуск и включение Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes

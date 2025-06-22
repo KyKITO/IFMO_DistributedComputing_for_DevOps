@@ -37,7 +37,7 @@
 - name: Генерируем docker-compose.yml с помощью jinja
   template:
     src: docker-compose.yml.j2
-    dest: {{ docker_compose_dir }}/docker-compose.yml
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
     mode: '0744'
 
 - name: Запуск Docker Compose
@@ -52,7 +52,7 @@
     port: "{{ mysql_port }}"
     delay: 10
     timeout: 300
-
+    
 - name: Проверка запущенных контейнеров
   docker_host_info:
     containers: yes

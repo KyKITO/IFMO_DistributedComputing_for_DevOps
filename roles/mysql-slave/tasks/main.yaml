@@ -1,16 +1,16 @@
-- name: Configure replication on Slave
+- name: Конфигурация replication у Slave
   community.mysql.mysql_replication:
-    mode: changemaster
+    mode: changeprimary
     master_host: db_master
-    master_user: repl_user
-    master_password: repl_password
+    master_user: "{{ db_repl_user }}"
+    master_password: "{{ db_repl_password }}"
     master_log_file: mysql-bin.000001
     master_log_pos: 1
     login_user: root
     login_password: "{{ db_root_pass }}"
 
-- name: Start replication
+- name: Запуск реприлики
   community.mysql.mysql_replication:
-    mode: startslave
+    mode: startreplica
     login_user: root
     login_password: "{{ db_root_pass }}"

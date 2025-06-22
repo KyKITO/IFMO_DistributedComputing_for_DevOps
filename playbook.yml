@@ -9,6 +9,8 @@
     docker_compose_dir: /home/user/wordpress
     db_repl_user: repl_user
     db_repl_password: repl_password
+    docker_users: [ ubuntu,user ]
+    mysql_port: 3306
   roles:
     - role: install-docker
     - role: wordpress
