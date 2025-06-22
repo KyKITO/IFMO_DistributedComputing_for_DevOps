@@ -6,6 +6,11 @@
     db_password: wordpress
     db_name: wordpress
     db_root_pass: root
+    docker_compose_dir: /home/user/wordpress
+    db_repl_user: repl_user
+    db_repl_password: repl_password
   roles:
     - role: install-docker
-    - role: wordpress 
+    - role: wordpress
+    - role: mysql-master
+    - role: mysql-slave 

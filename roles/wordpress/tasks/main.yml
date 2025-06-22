@@ -1,14 +1,59 @@
-- name: Ensure WordPress directory exists
-  file:
-    path: /home/user/wordpress
-    state: directory
+- name: Обновление кэша APT и установка необходимых пакетов
+  apt:
+    update_cache: yes
+    name:
+      - apt-transport-https
+      - software-properties-common
+      - python3-docker
+      - python3-pymysql
+      - python3-pip
+      - python3-mysqldb
+    state: present
 
-- name: Generate docker-compose.yml from template
+- name: Создание директории для WordPress (docker compose)
+  file:
+    path: "{{ docker_compose_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Копирование mysql-master.cnf
+  template:
+    src: "files/mysql-master.cnf"
+    dest: "{{ docker_compose_dir }}/mysql-master.cnf"
+    mode: '0744'
+
+- name: Копирование mysql-slave.cnf
+  template:
+    src: "files/mysql-slave.cnf"
+    dest: "{{ docker_compose_dir }}/mysql-slave.cnf"
+    mode: '0744'
+
+- name: Копирование nginx.conf
+  template:
+    src: "templates/nginx.conf"
+    dest: "{{ docker_compose_dir }}/nginx.conf"
+    mode: "0744"
+
+- name: Генерируем docker-compose.yml с помощью jinja
   template:
     src: docker-compose.yml.j2
-    dest: /home/user/wordpress/docker-compose.yml
+    dest: {{ docker_compose_dir }}/docker-compose.yml
+    mode: '0744'
 
-- name: Start WordPress and MySQL containers
-  command: docker-compose up -d
-  args:
-    chdir: /home/user/wordpress
+- name: Запуск Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_compose_dir }}"
+    files:
+      - docker-compose.yml
+    state: present  
+
+- name: Проверка доступности MySQL
+  wait_for:
+    port: "{{ mysql_port }}"
+    delay: 10
+    timeout: 300
+
+- name: Проверка запущенных контейнеров
+  docker_host_info:
+    containers: yes
+  register: all_containers

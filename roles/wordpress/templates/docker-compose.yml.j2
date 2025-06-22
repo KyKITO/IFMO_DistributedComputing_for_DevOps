@@ -8,7 +8,7 @@ services:
     volumes:
       - "wp_data:/var/www/html/"
     environment:
-      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_HOST: db_master:3306
       WORDPRESS_DB_USER: {{ db_user }}
       WORDPRESS_DB_PASSWORD: {{ db_password }}
       WORDPRESS_DB_NAME: {{ db_name }}
@@ -17,17 +17,36 @@ services:
     networks:
       - internal_network
       
-  db:
+  db_master:
     image: mysql:9.2.0
     container_name: mysql_master
     restart: always
     volumes:
       - "db_data:/var/lib/mysql"
+      - "./mysql-master.cnf:/etc/mysql/conf.d/replication.cnf"
     environment:
       MYSQL_ROOT_PASSWORD: {{ db_root_pass }}
       MYSQL_DATABASE: {{ db_name }}
       MYSQL_USER: {{ db_user }}
       MYSQL_PASSWORD: {{ db_password }}
+      MYSQL_REPLICATION_USER: {{ db_repl_user }}
+      MYSQL_REPLICATION_PASSWORD: {{ db_repl_password }}
+    networks:
+      - internal_network
+
+  db_slave:
+    image: mysql:9.2.0
+    container_name: mysql_slave
+    restart: always
+    volumes:
+      - "db_data:/var/lib/mysql"
+      - "./mysql-slave.cnf:/etc/mysql/conf.d/replication.cnf"
+    environment:
+      MYSQL_ROOT_PASSWORD: {{ db_root_pass }}
+      MYSQL_REPLICATION_USER: {{ db_repl_user }}
+      MYSQL_REPLICATION_PASSWORD: {{ db_repl_password }}
+    depends_on:
+      - db_master
     networks:
       - internal_network
 
