@@ -1,6 +1,6 @@
 - name: Создание replication user на мастере
   community.mysql.mysql_user:
-    login_host: "{{ ansible_host }}"
+    login_host: "127.0.0.1"
     login_port: "{{ mysql_port }}"
     login_user: root
     login_password: "{{ db_root_pass }}"
@@ -12,7 +12,7 @@
 
 - name: Получение master status
   community.mysql.mysql_query:
-    login_host: "{{ ansible_host }}"
+    login_host: "127.0.0.1"
     login_port: "{{ mysql_port }}"
     login_user: "root"
     login_password: "{{ db_root_pass }}"
