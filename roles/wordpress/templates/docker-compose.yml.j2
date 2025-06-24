@@ -38,7 +38,7 @@ services:
       - internal_network
 
   db_slave:
-    image: mysql:9.2.0
+    image: mysql:5.7
     container_name: mysql_slave
     restart: always
     volumes:
