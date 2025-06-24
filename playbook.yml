@@ -11,6 +11,8 @@
     db_repl_password: repl_password
     docker_users: [ ubuntu,user ]
     mysql_port: 3306
+    mysql_master_name: mysql_master
+    mysql_slave_name: mysql_slave
   roles:
     - role: install-docker
     - role: wordpress
