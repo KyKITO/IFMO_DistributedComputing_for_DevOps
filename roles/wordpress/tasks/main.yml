@@ -50,7 +50,7 @@
 - name: Проверка доступности MySQL
   wait_for:
     port: "{{ mysql_port }}"
-    delay: 10
+    delay: 30
     timeout: 300
     
 - name: Проверка запущенных контейнеров
