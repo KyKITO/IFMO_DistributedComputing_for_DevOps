@@ -1,0 +1,48 @@
+- name: Создание директории для Monitoring
+  file:
+    path: "{{ monitoring_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Копирование конфигурации Prometheus
+  template:
+    src: "templates/prometheus.yml.j2"
+    dest: "{{ monitoring_dir }}/prometheus.yml"
+    mode: '0744'
+
+- name: Копирование my.cnf
+  template:
+    src: "templates/my.cnf.j2"
+    dest: "{{ monitoring_dir }}/my.cnf"
+    mode: '0744'
+
+- name: Копирование конфигурации Grafana
+  copy:
+    src: "files/datasource.yml"
+    dest: "{{ monitoring_dir }}/datasource.yml"
+    mode: '0744'
+
+- name: Копирование конфигурации Dashboard'ов
+  copy:
+    src: "files/dashboard.yml"
+    dest: "{{ monitoring_dir }}/dashboard.yml"
+    mode: '0744'
+
+- name: Копирование MySQL-dashboard
+  copy:
+    src: "files/mysql-dashboard.json"
+    dest: "{{ monitoring_dir }}/mysql-dashboard.json"
+    mode: '0744'
+
+- name: Генерация docker-compose для мониторинга
+  template:
+    src: "templates/docker-compose-monitoring.yml.j2"
+    dest: "{{ monitoring_dir }}/docker-compose.yml"
+    mode: '0744'
+
+- name: Запуск сервисов мониторинга
+  community.docker.docker_compose_v2:
+    project_src: "{{ monitoring_dir }}"
+    files:
+      - docker-compose.yml
+    state: present

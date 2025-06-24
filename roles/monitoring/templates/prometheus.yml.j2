@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'mysql_master'
+    static_configs:
+      - targets: ['{{ mysql_exp_master_name }}:9104']
+    metrics_path: '/metrics'
+    params:
+      collect[]:
+        - global_status
+        - global_variables
+        - slave_status
+        - info_schema.processlist
+        - info_schema.innodb_metrics
+        - info_schema.tables
+        - perf_schema.eventsstatements
+        - perf_schema.eventswaits
+        - perf_schema.file_events
+        - perf_schema.indexiowaits
+        - perf_schema.tableiowaits
+        - perf_schema.tablelocks
+
+  - job_name: 'mysql_slave'
+    static_configs:
+      - targets: ['{{ mysql_exp_slave_name }}:9104']
+    metrics_path: '/metrics'
+    params:
+      collect[]:
+        - global_status
+        - global_variables
+        - slave_status
+        - info_schema.processlist
+        - info_schema.innodb_metrics
+        - info_schema.tables
+        - perf_schema.eventsstatements
+        - perf_schema.eventswaits
+        - perf_schema.file_events
+        - perf_schema.indexiowaits
+        - perf_schema.tableiowaits
+        - perf_schema.tablelocks
