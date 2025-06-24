@@ -20,7 +20,7 @@ services:
       
   db_master:
     image: mysql:5.7
-    container_name: mysql_master
+    container_name: {{mysql_master_name }}
     restart: always
     volumes:
       - "db_master:/var/lib/mysql"
@@ -39,11 +39,13 @@ services:
 
   db_slave:
     image: mysql:5.7
-    container_name: mysql_slave
+    container_name: {{ mysql_slave_name }}
     restart: always
     volumes:
       - "db_slave:/var/lib/mysql"
       - "./mysql-slave.cnf:/etc/mysql/conf.d/replication.cnf"
+    ports:
+      - 3307:3306
     environment:
       MYSQL_ROOT_PASSWORD: {{ db_root_pass }}
       MYSQL_REPLICATION_USER: {{ db_repl_user }}
@@ -70,6 +72,7 @@ services:
 networks:
   internal_network:
     driver: bridge
+    name: wordpress_internal_network
 
 volumes:
   wp_data:
