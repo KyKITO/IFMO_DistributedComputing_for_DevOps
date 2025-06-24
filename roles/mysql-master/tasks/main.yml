@@ -19,3 +19,31 @@
     query: "SHOW MASTER STATUS"
   register: master_status
   changed_when: false
+
+- name: Проверка статуса master перед настройкой репликации
+  debug:
+    var: master_status.query_result
+
+- name: Добавление прав REPLICATION CLIENT
+  community.mysql.mysql_query:
+    login_host: "127.0.0.1"
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    query: "GRANT REPLICATION CLIENT ON *.* TO '{{ db_repl_user }}'@'%'"
+
+- name: Добавление прав REPLICATION SLAVE
+  community.mysql.mysql_query:
+    login_host: "127.0.0.1"
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    query: "GRANT REPLICATION SLAVE ON *.* TO '{{ db_repl_user }}'@'%'"
+
+- name: Обновление привилегий
+  community.mysql.mysql_query:
+    login_host: "127.0.0.1"
+    login_port: "{{ mysql_port }}"
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    query: "FLUSH PRIVILEGES"
