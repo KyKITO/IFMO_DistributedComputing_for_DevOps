@@ -6,8 +6,8 @@
     db_password: wordpress
     db_name: wordpress
     db_root_pass: root
-    docker_compose_dir: "/home/user/wordpress"
-    monitoring_dir: "/home/user/monitoring"
+    docker_compose_dir: "{{ ansible_user_dir }}/wordpress"
+    monitoring_dir: "{{ ansible_user_dir }}/monitoring"
     db_repl_user: repl_user
     db_repl_password: repl_password
     docker_users: [ ubuntu,user ]
